@@ -2,12 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Page struct {
@@ -15,7 +17,19 @@ type Page struct {
 	Body  []byte
 }
 
-var test1 int = 10
+type User struct {
+	Uuid string
+	HeroId int
+	Atk int
+	Def int
+	MaxHp int
+	Hp int
+	MaxSp int
+	Sp int
+	Level int
+	Stage int
+}
+
 var db1 *sql.DB
 
 func createUUID() (uid string) {
@@ -79,21 +93,47 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("insert succ:", id)
-
-	test1++
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "dddd", test1)
-	//fmt.Fprint(w,"asdasdasd",r)
-}
-
-func signinViewHandler(w http.ResponseWriter, r *http.Request) {
-	 //var userID = r.Form.Get("user_id")
-
 }
 
 func loginViewHandler(w http.ResponseWriter, r *http.Request) {
-	var uuid = r.URL.Query().Get("uuid")
-	fmt.Printf("select fail [%s]",uuid)
-	rows,err := db1.Query("select id,user_name from user_info where device_id = ?",uuid);
+	var uuid = checkSignin(r)
+	var id,stage,heroId,atk,def,maxHp,hp,maxSp,sp,level int
+
+	rows,err := db1.Query("select id,stage from user_info where device_id = ?",uuid)
+	if err != nil{
+		fmt.Printf("select fail [%s]",err)
+	}
+	for rows.Next(){
+		rows.Columns()
+		err := rows.Scan(&id,&stage)
+		if err != nil{
+			fmt.Printf("get user info error [%s]",err)
+		}
+		break
+	}
+	rows1, err := db1.Query("select id,atk,def,maxhp,hp,maxsp,sp,level from hero_info where user_id = ?",id)
+	if err != nil{
+		fmt.Printf("select fail [%s]",err)
+	}
+	for rows1.Next(){
+		rows1.Columns()
+		err := rows1.Scan(&heroId,&atk,&def,&maxHp,&hp,&maxSp,&sp,&level)
+		if err != nil{
+			fmt.Printf("get user info error [%s]",err)
+		}
+		break
+	}
+
+
+	user := User{Uuid:uuid,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage}
+	result,err := json.Marshal(user)
+	w.Write(result)
+	//fmt.Fprintf(w,uuid)
+}
+
+func checkSignin(r *http.Request)(uuidResult string)  {
+	var uuid = r.Header.Get("uuid")
+	rows,err := db1.Query("select id,user_name from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("select fail [%s]",err)
 	}
@@ -110,27 +150,31 @@ func loginViewHandler(w http.ResponseWriter, r *http.Request) {
 		mapUser[username] = id
 		break
 	}
-	if len(mapUser) > 0 {
-		fmt.Fprintf(w, "1")
-	}else{
+	if len(mapUser) == 0 {
 		var newuuid = createUUID()
 		r1, err1 := db1.Exec("insert into user_info (user_name,device_id) values (?,?)","New user",newuuid)
 		id, err1 := r1.LastInsertId()
 		if err1 != nil {
 			fmt.Println("exec failed, ", err1)
-			//return
 		}
-		fmt.Println("new id: ", id)
 		r2, err1 := db1.Exec("insert into hero_info (hero_name,user_id) values (?,?)","New hero",id)
-		r3, err1 := r2.LastInsertId()
+		r2.LastInsertId()
 		if err1 != nil {
 			fmt.Println("exec failed, ", err1)
 			return
 		}
-		fmt.Println("new id: ", r3)
-
-		fmt.Fprintf(w, newuuid)
+		uuid = newuuid
 	}
+	return uuid
+}
+
+func stageClear(w http.ResponseWriter, r *http.Request){
+	var uuid = r.Header.Get("uuid")
+	var stage = r.Header.Get("stage")
+	stageint,_ := strconv.Atoi(stage)
+	stageint += 1
+	db1.Exec("update user_info  set stage = ? where device_id = ?",stageint,uuid)
+	fmt.Fprintf(w,strconv.Itoa(stageint))
 }
 
 func main() {
@@ -141,7 +185,7 @@ func main() {
 		fmt.Println("connect to mysql success")
 	}
 	db1 = db
-	http.HandleFunc("/signin", signinViewHandler)
 	http.HandleFunc("/login", loginViewHandler)
+	http.HandleFunc("/stage_clear",stageClear)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

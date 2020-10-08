@@ -19,7 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="23d97132-a9ba-4eff-adbf-72eb11417cdc" name="Default Changelist" comment="" />
+    <list default="true" id="23d97132-a9ba-4eff-adbf-72eb11417cdc" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/80d966a0-48ab-40ec-b495-bf7a400d226b.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/80d966a0-48ab-40ec-b495-bf7a400d226b.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helloworld.go" beforeDir="false" afterPath="$PROJECT_DIR$/helloworld.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -112,6 +116,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -121,25 +126,25 @@
       <screen x="0" y="23" width="1680" height="979" />
     </state>
     <state x="530" y="174" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1680.979@0.23.1680.979" timestamp="1601910479276" />
-    <state width="1638" height="107" key="GridCell.Tab.0.bottom" timestamp="1601995909066">
+    <state width="1638" height="206" key="GridCell.Tab.0.bottom" timestamp="1602142927284">
       <screen x="0" y="23" width="1680" height="977" />
     </state>
-    <state width="1638" height="107" key="GridCell.Tab.0.bottom/0.23.1680.977@0.23.1680.977" timestamp="1601995909066" />
+    <state width="1638" height="206" key="GridCell.Tab.0.bottom/0.23.1680.977@0.23.1680.977" timestamp="1602142927284" />
     <state width="1638" height="233" key="GridCell.Tab.0.bottom/0.23.1680.979@0.23.1680.979" timestamp="1601975382583" />
-    <state width="1638" height="107" key="GridCell.Tab.0.center" timestamp="1601995909065">
+    <state width="1638" height="206" key="GridCell.Tab.0.center" timestamp="1602142927283">
       <screen x="0" y="23" width="1680" height="977" />
     </state>
-    <state width="1638" height="107" key="GridCell.Tab.0.center/0.23.1680.977@0.23.1680.977" timestamp="1601995909065" />
+    <state width="1638" height="206" key="GridCell.Tab.0.center/0.23.1680.977@0.23.1680.977" timestamp="1602142927283" />
     <state width="1638" height="233" key="GridCell.Tab.0.center/0.23.1680.979@0.23.1680.979" timestamp="1601975382582" />
-    <state width="1638" height="107" key="GridCell.Tab.0.left" timestamp="1601995909065">
+    <state width="1638" height="206" key="GridCell.Tab.0.left" timestamp="1602142927282">
       <screen x="0" y="23" width="1680" height="977" />
     </state>
-    <state width="1638" height="107" key="GridCell.Tab.0.left/0.23.1680.977@0.23.1680.977" timestamp="1601995909065" />
+    <state width="1638" height="206" key="GridCell.Tab.0.left/0.23.1680.977@0.23.1680.977" timestamp="1602142927282" />
     <state width="1638" height="233" key="GridCell.Tab.0.left/0.23.1680.979@0.23.1680.979" timestamp="1601975382582" />
-    <state width="1638" height="107" key="GridCell.Tab.0.right" timestamp="1601995909065">
+    <state width="1638" height="206" key="GridCell.Tab.0.right" timestamp="1602142927284">
       <screen x="0" y="23" width="1680" height="977" />
     </state>
-    <state width="1638" height="107" key="GridCell.Tab.0.right/0.23.1680.977@0.23.1680.977" timestamp="1601995909065" />
+    <state width="1638" height="206" key="GridCell.Tab.0.right/0.23.1680.977@0.23.1680.977" timestamp="1602142927284" />
     <state width="1638" height="233" key="GridCell.Tab.0.right/0.23.1680.979@0.23.1680.979" timestamp="1601975382583" />
     <state width="243" height="457" key="HiddenNamespacesPopup" timestamp="1601909142359">
       <screen x="0" y="23" width="1680" height="979" />
@@ -149,9 +154,10 @@
       <screen x="0" y="23" width="1680" height="979" />
     </state>
     <state x="431" y="147" key="SettingsEditor/0.23.1680.979@0.23.1680.979" timestamp="1601909126387" />
-    <state x="370" y="116" width="776" height="669" key="com.intellij.database.view.ui.AbstractDbRefactoringDialog" timestamp="1601974686173">
-      <screen x="0" y="23" width="1680" height="979" />
+    <state x="370" y="116" width="645" height="655" key="com.intellij.database.view.ui.AbstractDbRefactoringDialog" timestamp="1602078646499">
+      <screen x="0" y="23" width="1680" height="977" />
     </state>
+    <state x="370" y="116" width="645" height="655" key="com.intellij.database.view.ui.AbstractDbRefactoringDialog/0.23.1680.977@0.23.1680.977" timestamp="1602078646499" />
     <state x="370" y="116" width="776" height="669" key="com.intellij.database.view.ui.AbstractDbRefactoringDialog/0.23.1680.979@0.23.1680.979" timestamp="1601974686173" />
     <state x="628" y="141" width="604" height="735" key="find.popup" timestamp="1601906137879">
       <screen x="0" y="23" width="1680" height="979" />
