@@ -1,0 +1,51 @@
+create table user_info
+(
+    id                mediumint auto_increment
+        primary key,
+    user_name         varchar(30)       not null,
+    device_id         varchar(100)      not null,
+    town_hall_level   int default 1     not null,
+    laboratory_level  int default 1     not null,
+    gunship_level     int default 1     not null,
+    vault_level       int default 1     not null,
+    common_piece      int default 0     not null,
+    rare_piece        int default 0     not null,
+    epic_piece        int default 0     not null,
+    common_piece_ice  int default 0     not null,
+    rare_piece_ice    int default 0     not null,
+    epic_piece_ice    int default 0     not null,
+    common_piece_fire int default 0     not null,
+    rare_piece_fire   int default 0     not null,
+    epic_piece_fire   int default 0     not null,
+    common_piece_dark int default 0     not null,
+    rare_piece_dark   int default 0     not null,
+    epic_piece_dark   int default 0     not null,
+    gold_count        int default 10000 not null,
+    wood_count        int default 9000  not null,
+    stone_count       int default 0     not null,
+    iron_count        int default 0     not null,
+    diamond_count     int default 50    not null,
+    max_gold_count    int default 10000 not null,
+    max_wood_count    int default 10000 not null,
+    max_stone_count   int default 10000 not null,
+    max_iron_count    int default 10000 not null,
+    reward_count      int default 0     not null,
+    exp_count         int default 0     not null,
+    exp_level         int default 1     not null,
+    worker_count      int default 1     not null,
+    stage             int default 1     not null,
+    item1             int default 0     not null,
+    current_w         int default 1     null,
+    ak47_lvl          int default 1     null,
+    m16_lvl           int default 1     null,
+    scatter_lvl       int default 1     null,
+    firegun_lvl       int default 1     null,
+    rpg_lvl           int default 1     null,
+    laserx_lvl        int default 1     null,
+    awp_lvl           int default 1     null,
+    constraint device_id
+        unique (device_id)
+)
+    charset = latin1;
+
+INSERT INTO BlueNoah.user_info (id, user_name, device_id, town_hall_level, laboratory_level, gunship_level, vault_level, common_piece, rare_piece, epic_piece, common_piece_ice, rare_piece_ice, epic_piece_ice, common_piece_fire, rare_piece_fire, epic_piece_fire, common_piece_dark, rare_piece_dark, epic_piece_dark, gold_count, wood_count, stone_count, iron_count, diamond_count, max_gold_count, max_wood_count, max_stone_count, max_iron_count, reward_count, exp_count, exp_level, worker_count, stage, item1, current_w, ak47_lvl, m16_lvl, scatter_lvl, firegun_lvl, rpg_lvl, laserx_lvl, awp_lvl) VALUES (2, 'New user', '935d26e1-fc7f-401d-9ec3-96e8a836a521', 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10000, 9000, 0, 0, 50, 10000, 10000, 10000, 10000, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1);
