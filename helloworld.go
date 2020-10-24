@@ -39,6 +39,12 @@ type User struct {
 	Rpg_lvl int
 	Laserx_lvl int
 	Awp_lvl int
+	Atk_up int
+	Atk_speed_up int
+	Critical_up int
+	Speed_up int
+	Atk_boss_up int
+	Hp_up int
 }
 
 type BattleResult struct {
@@ -118,14 +124,17 @@ func loginViewHandler(w http.ResponseWriter, r *http.Request) {
 
 func returnUser(w http.ResponseWriter,uuid string){
 	var id,stage,heroId,atk,def,maxHp,hp,maxSp,sp,level,critical,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl int
+	var atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up int
+
+
 	var item1 int64
-	rows,err := db1.Query("select id,stage,item1,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl from user_info where device_id = ?",uuid)
+	rows,err := db1.Query("select id,stage,item1,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl,atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up  from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("returnUser:select fail [%s]",err)
 	}
 	for rows.Next(){
 		rows.Columns()
-		err := rows.Scan(&id,&stage,&item1,&current_w,&ak47_lvl,&m16_lvl,&scatter_lvl,&firegun_lvl,&rpg_lvl,&laserx_lvl,&awp_lvl)
+		err := rows.Scan(&id,&stage,&item1,&current_w,&ak47_lvl,&m16_lvl,&scatter_lvl,&firegun_lvl,&rpg_lvl,&laserx_lvl,&awp_lvl,&atk_up,&atk_speed_up,&critical_up,&speed_up,&atk_boss_up,&hp_up )
 		if err != nil{
 			fmt.Printf("returnUser:get user info error [%s]",err)
 		}
@@ -143,7 +152,7 @@ func returnUser(w http.ResponseWriter,uuid string){
 		}
 		break
 	}
-	user := User{Uuid:uuid,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl }
+	user := User{Uuid:uuid,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl,Atk_up:atk_up,Atk_speed_up:atk_speed_up,Critical_up:critical_up,Speed_up:speed_up,Atk_boss_up:atk_boss_up,Hp_up:hp_up  }
 	result,err := json.Marshal(user)
 	fmt.Printf(string(result) )
 	w.Write(result)
@@ -243,6 +252,68 @@ func weaponUpgrade(w http.ResponseWriter, r *http.Request)  {
 	}
 }
 
+func inherenceUpgrade(w http.ResponseWriter, r *http.Request){
+	var uuid = r.Header.Get("uuid")
+	var inherence =  r.Header.Get("inherence")
+	var column string
+	var max int
+	var plus int
+	switch inherence {
+	case "0":
+		column = "atk_up"
+		max = 10000 //100倍
+		plus = 15 //15%
+		break
+	case "1":
+		column = "atk_speed_up"
+		max = 1000 //1倍
+		plus = 10 //1%
+		break
+	case "2":
+		column = "critical_up"
+		max = 10000
+		plus = 10 //1%
+		break
+	case "3":
+		column = "speed_up"
+		max = 1000 //1倍
+		plus = 10 //1%
+		break
+	case "4":
+		column = "atk_boss_up"
+		max = 10000
+		plus = 15//15%
+		break
+	case "5":
+		column = "hp_up"
+		max = 5
+		plus = 1
+		break
+	}
+
+	rows,err := db1.Query("select " + column +" from user_info where device_id = ?",uuid)
+	if err != nil{
+		fmt.Printf("select fail [%s]",err)
+	}
+	var inherenceV int
+	for rows.Next(){
+		rows.Columns()
+		err := rows.Scan(&inherenceV)
+		if err != nil{
+			fmt.Printf("get user info error [%s]",err)
+		}
+		break
+	}
+	if(inherenceV < max){
+		inherenceV += plus
+		if(inherenceV > max){
+			inherenceV = max
+		}
+	}
+	db1.Exec("update user_info  set " + column + " = ? where device_id = ?",inherenceV,uuid)
+	returnUser(w,uuid)
+}
+
 func stageClear(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	//TODO
@@ -294,5 +365,6 @@ func main() {
 	http.HandleFunc("/stage_clear",stageClear)
 	http.HandleFunc("/weapon_upgrade",weaponUpgrade)
 	http.HandleFunc("/weapon_set",setCurrentWeapon)
+	http.HandleFunc("/inherence_upgrade",inherenceUpgrade)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
