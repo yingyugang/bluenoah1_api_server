@@ -18,6 +18,16 @@ type Page struct {
 	Title string
 	Body  []byte
 }
+
+type UpgradeData struct {
+	Coin int64
+	Diamond int64
+	GreenGear int64
+	BlueGear int64
+	PurpleGear int64
+	OrangeGear int64
+}
+
 //注意，首字母一定要大写
 type User struct {
 	Uuid string
@@ -262,27 +272,51 @@ func weaponUpgrade(w http.ResponseWriter, r *http.Request)  {
 	}
 
 	var lvl int
-	var item1 int64
-	rows,err := db1.Query("select " + column + ",item1 from user_info where device_id = ?",uuid)
+	var item1,item2,item3,item4,item5 int64
+	rows,err := db1.Query("select " + column + ",item1,item2,item3,item4,item5 from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("select fail [%s]",err)
 	}
 	for rows.Next(){
 		rows.Columns()
-		err := rows.Scan(&lvl,&item1)
+		err := rows.Scan(&lvl,&item1,&item2,&item3,&item4,&item5)
 		if err != nil{
 			fmt.Printf("get user info error [%s]",err)
 		}
 		break
 	}
-	var coin = int64(math.Floor (70 * math.Pow(1.14,	float64(lvl-1))))
-	fmt.Printf("coin:[%s]\n",math.Pow(1.14,	float64(lvl + 1)))
-	fmt.Printf("select [%s]\n",lvl)
-	if item1 >= coin {
-		item1-=coin
-		db1.Exec("update user_info  set " + column + " = ?,item1 = ? where device_id = ?",lvl + 1,item1,uuid)
-		returnUser(w,uuid)
+	var upgradeData = getUpgradeData(lvl)
+	if upgradeData.Coin <= item1 && upgradeData.GreenGear <= item2 && upgradeData.BlueGear <= item3 && upgradeData.PurpleGear <= item4 && upgradeData.OrangeGear <= item5{
+		item1 -= upgradeData.Coin
+		item2 -= upgradeData.GreenGear
+		item3 -= upgradeData.BlueGear
+		item4 -= upgradeData.PurpleGear
+		item5 -= upgradeData.OrangeGear
+		db1.Exec("update user_info  set " + column + " = ?,item1 = ?,item2 = ?,item3 = ?,item4 = ?,item5 = ? where device_id = ?",lvl + 1,item1,item2,item3,item4,item5,uuid)
 	}
+	returnUser(w,uuid)
+}
+var LvlUpGold float64 = 70
+var CommonMulti float64 = 1.14
+func getUpgradeData(level int)(upgradeData UpgradeData) {
+ 	var coin int64
+ 	coin = int64(LvlUpGold * math.Pow(CommonMulti,float64(level - 1)))
+	upgradeData = UpgradeData{Coin:coin }
+	if level == 20 {
+		upgradeData.GreenGear = 10
+	}else if level == 80 {
+		upgradeData.GreenGear = 25
+		upgradeData.BlueGear = 10
+	}else if level == 120 {
+		upgradeData.GreenGear = 95
+		upgradeData.BlueGear = 70
+		upgradeData.PurpleGear = 25
+	} else if level == 220 {
+		upgradeData.BlueGear = 135
+		upgradeData.PurpleGear = 80
+		upgradeData.OrangeGear = 30
+	}
+	return upgradeData
 }
 
 func inherenceUpgrade(w http.ResponseWriter, r *http.Request){
