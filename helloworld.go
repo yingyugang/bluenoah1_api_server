@@ -185,27 +185,49 @@ func returnUser(w http.ResponseWriter,uuid string){
 
 func checkSignin(r *http.Request)(uuidResult string)  {
 	var uuid = r.Header.Get("uuid")
-	rows,err := db1.Query("select id,user_name from user_info where device_id = ?",uuid)
-	if err != nil{
-		fmt.Printf("select fail [%s]",err)
-	}
+	var ios = r.Header.Get("iosUser")
+	var hasIos = r.Header.Get("hasIosUser")
+	hasIosInt,err := strconv.Atoi(hasIos)
 	var mapUser map[string]int
 	mapUser = make(map[string]int)
-
-	for rows.Next(){
-		var id int
-		var username string
-		rows.Columns()
-		err := rows.Scan(&id,&username)
+	if len(uuid)==0 && hasIosInt==1 {
+		rows,err := db1.Query("select id,user_name,has_ios_account,ios_account,device_id from user_info where ios_account = ?",ios)
 		if err != nil{
-			fmt.Printf("get user info error [%s]",err)
+			fmt.Printf("select fail [%s]",err)
 		}
-		mapUser[username] = id
-		break
+		var id,has_ios_account int
+		var username,ios_account,device_id string
+		for rows.Next(){
+			rows.Columns()
+			err := rows.Scan(&id,&username,&has_ios_account,&ios_account,&device_id)
+			if err != nil{
+				fmt.Printf("get user info error [%s]",err)
+			}
+			mapUser[username] = id
+			uuid = device_id
+			break
+		}
+	}else{
+		rows,err := db1.Query("select id,user_name,has_ios_account,ios_account from user_info where device_id = ?",uuid)
+		if err != nil{
+			fmt.Printf("select fail [%s]",err)
+		}
+		var id,has_ios_account int
+		var username,ios_account string
+		for rows.Next(){
+			rows.Columns()
+			err := rows.Scan(&id,&username,&has_ios_account,&ios_account)
+			if err != nil{
+				fmt.Printf("get user info error [%s]",err)
+			}
+			mapUser[username] = id
+			break
+		}
 	}
+
 	if len(mapUser) == 0 {
 		var newuuid = createUUID()
-		r1, err1 := db1.Exec("insert into user_info (user_name,device_id) values (?,?)","New user",newuuid)
+		r1, err1 := db1.Exec("insert into user_info (user_name,device_id,has_ios_account,ios_account) values (?,?,?,?)","New user",newuuid,hasIosInt,ios)
 		id, err1 := r1.LastInsertId()
 		if err1 != nil {
 			fmt.Println("exec failed, ", err1)
