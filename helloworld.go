@@ -341,6 +341,84 @@ func getUpgradeData(level int)(upgradeData UpgradeData) {
 	return upgradeData
 }
 
+func weaponUpgradeBulk(w http.ResponseWriter, r *http.Request){
+	var uuid = r.Header.Get("uuid")
+	var weapon = r.Header.Get("weapon")
+	weaponId,err :=  strconv.Atoi(weapon)
+	if err != nil{
+		fmt.Printf("select fail [%s]",err)
+	}
+	var column string
+	switch weaponId {
+	case 0:
+		column = "ak47_lvl"
+		break
+	case 1:
+		column = "m16_lvl"
+		break
+	case 2:
+		column = "scatter_lvl"
+		break
+	case 3:
+		column = "firegun_lvl"
+		break
+	case 4:
+		column = "rpg_lvl"
+		break
+	case 5:
+		column = "laserx_lvl"
+		break
+	case 6:
+		column = "awp_lvl"
+		break
+	}
+	var lvl int
+	var item1,item2,item3,item4,item5 int64
+	rows,err := db1.Query("select " + column + ",item1,item2,item3,item4,item5 from user_info where device_id = ?",uuid)
+	if err != nil{
+		fmt.Printf("select fail [%s]",err)
+	}
+	for rows.Next(){
+		rows.Columns()
+		err := rows.Scan(&lvl,&item1,&item2,&item3,&item4,&item5)
+		if err != nil{
+			fmt.Printf("get user info error [%s]",err)
+		}
+		break
+	}
+
+	var maxLvl = getMaxLevel(lvl)
+	var totalCost int64 = 0
+	var nextLvl = lvl
+	for i := lvl + 1;i <= maxLvl;i++  {
+		var upgradeData = getUpgradeData(i)
+		if upgradeData.Coin + totalCost <= item1{
+			totalCost += upgradeData.Coin
+			nextLvl = i
+		}else{
+			break
+		}
+	}
+
+	if nextLvl > lvl {
+		db1.Exec("update user_info  set " + column + " = ?,item1 = ? where device_id = ?",nextLvl,item1 - totalCost,uuid)
+	}
+	returnUser(w,uuid)
+}
+
+func getMaxLevel(currentLvl int)(maxLevl int){
+	if currentLvl < 20 {
+		return 20
+	}
+	if currentLvl < 80 {
+		return 80
+	}
+	if currentLvl < 120 {
+		return 120
+	}
+	return 220
+}
+
 func inherenceUpgrade(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var inherence =  r.Header.Get("inherence")
@@ -549,6 +627,7 @@ func main() {
 	http.HandleFunc("/login", loginViewHandler)
 	http.HandleFunc("/stage_clear",stageClear)
 	http.HandleFunc("/weapon_upgrade",weaponUpgrade)
+	http.HandleFunc("/weapon_upgrade_bulk",weaponUpgradeBulk)
 	http.HandleFunc("/weapon_set",setCurrentWeapon)
 	http.HandleFunc("/inherence_upgrade",inherenceUpgrade)
 	http.HandleFunc("/revive",revive)
