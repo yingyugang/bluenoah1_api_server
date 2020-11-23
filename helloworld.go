@@ -20,12 +20,13 @@ type Page struct {
 }
 
 type UpgradeData struct {
-	Coin int64
+	Coin float64
 	Diamond int64
 	GreenGear int64
 	BlueGear int64
 	PurpleGear int64
 	OrangeGear int64
+	SupperGear int64
 }
 
 //注意，首字母一定要大写
@@ -40,11 +41,12 @@ type User struct {
 	Sp int
 	Level int
 	Stage int
-	Item1 int64
+	Item1 float64
 	Item2 int64
 	Item3 int64
 	Item4 int64
 	Item5 int64
+	Item6 int64
 	Critical int
 	Current_w int
 	Ak47_lvl int
@@ -71,7 +73,7 @@ type User struct {
 
 type BattleResult struct {
 	Stage int
-	Item1 int64
+	Item1 float64
 	Item2 int64
 	Item3 int64
 	Item4 int64
@@ -114,14 +116,15 @@ func returnUser(w http.ResponseWriter,uuid string){
 	var atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up int
 	var lastday,loginday,bonus,shop_item_1,shop_item_2 int
 
-	var item1,item2,item3,item4,item5 int64
-	rows,err := db1.Query("select id,stage,item1,item2,item3,item4,item5,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl,atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up,lastday,loginday,bonus,shop_item_1,shop_item_2  from user_info where device_id = ?",uuid)
+	var item2,item3,item4,item5,item6 int64
+	var item1 float64
+	rows,err := db1.Query("select id,stage,item1,item2,item3,item4,item5,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl,atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up,lastday,loginday,bonus,shop_item_1,shop_item_2,item6  from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("returnUser:select fail [%s]",err)
 	}
 	for rows.Next(){
 		rows.Columns()
-		err := rows.Scan(&id,&stage,&item1,&item2,&item3,&item4,&item5,&current_w,&ak47_lvl,&m16_lvl,&scatter_lvl,&firegun_lvl,&rpg_lvl,&laserx_lvl,&awp_lvl,&atk_up,&atk_speed_up,&critical_up,&speed_up,&atk_boss_up,&hp_up,&diamond_count,&dodge_up,&lastday,&loginday,&bonus,&shop_item_1,&shop_item_2)
+		err := rows.Scan(&id,&stage,&item1,&item2,&item3,&item4,&item5,&current_w,&ak47_lvl,&m16_lvl,&scatter_lvl,&firegun_lvl,&rpg_lvl,&laserx_lvl,&awp_lvl,&atk_up,&atk_speed_up,&critical_up,&speed_up,&atk_boss_up,&hp_up,&diamond_count,&dodge_up,&lastday,&loginday,&bonus,&shop_item_1,&shop_item_2,&item6)
 		if err != nil{
 			fmt.Printf("returnUser:get user info error [%s]",err)
 		}
@@ -139,7 +142,7 @@ func returnUser(w http.ResponseWriter,uuid string){
 		}
 		break
 	}
-	user := User{Uuid:uuid,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Item2:item2,Item3:item3,Item4:item4,Item5:item5,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl,Atk_up:atk_up,Atk_speed_up:atk_speed_up,Critical_up:critical_up,Speed_up:speed_up,Atk_boss_up:atk_boss_up,Hp_up:hp_up,Diamond_count:diamond_count,Dodge_up:dodge_up,Lastday:lastday,Loginday:loginday,Bonus:bonus,Shop_item_1:shop_item_1,Shop_item_2:shop_item_2  }
+	user := User{Uuid:uuid,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Item2:item2,Item3:item3,Item4:item4,Item5:item5,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl,Atk_up:atk_up,Atk_speed_up:atk_speed_up,Critical_up:critical_up,Speed_up:speed_up,Atk_boss_up:atk_boss_up,Hp_up:hp_up,Diamond_count:diamond_count,Dodge_up:dodge_up,Lastday:lastday,Loginday:loginday,Bonus:bonus,Shop_item_1:shop_item_1,Shop_item_2:shop_item_2 ,Item6: item6}
 	result,err := json.Marshal(user)
 	fmt.Printf(string(result) )
 	w.Write(result)
@@ -222,165 +225,6 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 	}
 	return uuid
 }
-
-func weaponUpgrade(w http.ResponseWriter, r *http.Request)  {
-	var uuid = r.Header.Get("uuid")
-	var weapon = r.Header.Get("weapon")
-	weaponId,err :=  strconv.Atoi(weapon)
-	if err != nil{
-		fmt.Printf("select fail [%s]",err)
-	}
-	var column string
-	switch weaponId {
-	case 0:
-		column = "ak47_lvl"
-		break
-	case 1:
-		column = "m16_lvl"
-		break
-	case 2:
-		column = "scatter_lvl"
-		break
-	case 3:
-		column = "firegun_lvl"
-		break
-	case 4:
-		column = "rpg_lvl"
-		break
-	case 5:
-		column = "laserx_lvl"
-		break
-	case 6:
-		column = "awp_lvl"
-		break
-	}
-
-	var lvl int
-	var item1,item2,item3,item4,item5 int64
-	rows,err := db1.Query("select " + column + ",item1,item2,item3,item4,item5 from user_info where device_id = ?",uuid)
-	if err != nil{
-		fmt.Printf("select fail [%s]",err)
-	}
-	for rows.Next(){
-		rows.Columns()
-		err := rows.Scan(&lvl,&item1,&item2,&item3,&item4,&item5)
-		if err != nil{
-			fmt.Printf("get user info error [%s]",err)
-		}
-		break
-	}
-	var upgradeData = getUpgradeData(lvl)
-	if upgradeData.Coin <= item1 && upgradeData.GreenGear <= item2 && upgradeData.BlueGear <= item3 && upgradeData.PurpleGear <= item4 && upgradeData.OrangeGear <= item5{
-		item1 -= upgradeData.Coin
-		item2 -= upgradeData.GreenGear
-		item3 -= upgradeData.BlueGear
-		item4 -= upgradeData.PurpleGear
-		item5 -= upgradeData.OrangeGear
-		db1.Exec("update user_info  set " + column + " = ?,item1 = ?,item2 = ?,item3 = ?,item4 = ?,item5 = ? where device_id = ?",lvl + 1,item1,item2,item3,item4,item5,uuid)
-	}
-	returnUser(w,uuid)
-}
-var LvlUpGold float64 = 70
-var CommonMulti float64 = 1.14
-func getUpgradeData(level int)(upgradeData UpgradeData) {
- 	var coin int64
- 	coin = int64(LvlUpGold * math.Pow(CommonMulti,float64(level - 1)))
-	upgradeData = UpgradeData{Coin:coin }
-	if level == 20 {
-		upgradeData.GreenGear = 10
-	}else if level == 80 {
-		upgradeData.GreenGear = 25
-		upgradeData.BlueGear = 10
-	}else if level == 120 {
-		upgradeData.GreenGear = 95
-		upgradeData.BlueGear = 70
-		upgradeData.PurpleGear = 25
-	} else if level == 220 {
-		upgradeData.BlueGear = 135
-		upgradeData.PurpleGear = 80
-		upgradeData.OrangeGear = 30
-	}
-	return upgradeData
-}
-
-func weaponUpgradeBulk(w http.ResponseWriter, r *http.Request){
-	var uuid = r.Header.Get("uuid")
-	var weapon = r.Header.Get("weapon")
-	weaponId,err :=  strconv.Atoi(weapon)
-	if err != nil{
-		fmt.Printf("select fail [%s]",err)
-	}
-	var column string
-	switch weaponId {
-	case 0:
-		column = "ak47_lvl"
-		break
-	case 1:
-		column = "m16_lvl"
-		break
-	case 2:
-		column = "scatter_lvl"
-		break
-	case 3:
-		column = "firegun_lvl"
-		break
-	case 4:
-		column = "rpg_lvl"
-		break
-	case 5:
-		column = "laserx_lvl"
-		break
-	case 6:
-		column = "awp_lvl"
-		break
-	}
-	var lvl int
-	var item1,item2,item3,item4,item5 int64
-	rows,err := db1.Query("select " + column + ",item1,item2,item3,item4,item5 from user_info where device_id = ?",uuid)
-	if err != nil{
-		fmt.Printf("select fail [%s]",err)
-	}
-	for rows.Next(){
-		rows.Columns()
-		err := rows.Scan(&lvl,&item1,&item2,&item3,&item4,&item5)
-		if err != nil{
-			fmt.Printf("get user info error [%s]",err)
-		}
-		break
-	}
-
-	var maxLvl = getMaxLevel(lvl)
-	var totalCost int64 = 0
-	var nextLvl = lvl
-	for i := lvl + 1;i <= maxLvl;i++  {
-		var upgradeData = getUpgradeData(i)
-		if upgradeData.Coin + totalCost <= item1{
-			totalCost += upgradeData.Coin
-			nextLvl = i
-		}else{
-			break
-		}
-	}
-
-	if nextLvl > lvl {
-		db1.Exec("update user_info  set " + column + " = ?,item1 = ? where device_id = ?",nextLvl,item1 - totalCost,uuid)
-	}
-	returnUser(w,uuid)
-}
-
-func getMaxLevel(currentLvl int)(maxLevl int){
-	if currentLvl < 20 {
-		return 20
-	}
-	if currentLvl < 80 {
-		return 80
-	}
-	if currentLvl < 120 {
-		return 120
-	}
-	return 220
-}
-
 func inherenceUpgrade(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var inherence =  r.Header.Get("inherence")
@@ -465,7 +309,8 @@ func stageClear(w http.ResponseWriter, r *http.Request){
 		fmt.Printf("select fail [%s]",err)
 	}
 	var stage int
-	var item1,item2,item3,item4,item5 int64
+	var item2,item3,item4,item5 int64
+	var item1 float64
 	for rows.Next(){
 		rows.Columns()
 		err := rows.Scan(&stage,&item1,&item2,&item3,&item4,&item5)
@@ -521,7 +366,8 @@ func loginBonusObtain(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var ads = r.Header.Get("ads")
 	var lastday,loginday,bonus int
-	var item1,item2,item3,item4,item5,diamond_count int64
+	var item2,item3,item4,item5,diamond_count int64
+	var item1 float64
 	rows,err := db1.Query("select item1,item2,item3,item4,item5,diamond_count,lastday,loginday,bonus  from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("returnUser:select fail [%s]",err)
@@ -543,8 +389,8 @@ func loginBonusObtain(w http.ResponseWriter, r *http.Request){
 		}
 		switch day {
 		case 0:
-			var coin = int64(math.Floor (1000000 * math.Pow(1.14,float64(week))))
-			db1.Exec("update user_info set item1 = ?,bonus = ? where device_id = ?",item1 + coin * multi,1,uuid)
+			var coin = math.Floor (1000000 * math.Pow(1.14,float64(week)))
+			db1.Exec("update user_info set item1 = ?,bonus = ? where device_id = ?",item1 + coin * float64(multi),1,uuid)
 			fmt.Printf(uuid)
 			break
 		case 1:
@@ -552,20 +398,20 @@ func loginBonusObtain(w http.ResponseWriter, r *http.Request){
 			db1.Exec("update user_info  set diamond_count = ?,bonus = 1 where device_id = ?",diamond_count + diamond * multi,uuid)
 			break
 		case 2:
-			var coin = int64(math.Floor (70 * math.Pow(1.14,	float64(week)))) * 2
-			db1.Exec("update user_info  set item1 = ?,bonus = 1 where device_id = ?",item1 + coin * multi,uuid)
+			var coin = math.Floor (1000000 * math.Pow(1.14,	float64(week))) * 2
+			db1.Exec("update user_info  set item1 = ?,bonus = 1 where device_id = ?",item1 + coin * float64(multi),uuid)
 			break
 		case 3:
-			var coin = int64(math.Floor (70 * math.Pow(1.14,	float64(week)))) * 3
-			db1.Exec("update user_info  set item1 = ?,bonus = 1 where device_id = ?",item1 + coin * multi,uuid)
+			var coin = math.Floor (1000000 * math.Pow(1.14,	float64(week))) * 3
+			db1.Exec("update user_info  set item1 = ?,bonus = 1 where device_id = ?",item1 + coin * float64(multi),uuid)
 			break
 		case 4:
 			var diamond int64 = 20
 			db1.Exec("update user_info  set diamond_count = ?,bonus = 1 where device_id = ?",diamond_count + diamond * multi,uuid)
 			break
 		case 5:
-			var coin = int64(math.Floor (70 * math.Pow(1.14,	float64(week))))* 5
-			db1.Exec("update user_info  set item1 = ?,bonus = 1 where device_id = ?",item1 + coin * multi,uuid)
+			var coin = math.Floor (1000000 * math.Pow(1.14,	float64(week)))* 5
+			db1.Exec("update user_info  set item1 = ?,bonus = 1 where device_id = ?",item1 + coin * float64(multi),uuid)
 			break
 		case 6:
 			var diamond int64 = 30
