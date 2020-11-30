@@ -31,15 +31,18 @@ func weaponUpgrade(w http.ResponseWriter, r *http.Request)  {
 		column = "scatter_lvl"
 		break
 	case 3:
-		column = "firegun_lvl"
+		column = "laser_lvl"
 		break
 	case 4:
-		column = "rpg_lvl"
+		column = "firegun_lvl"
 		break
 	case 5:
-		column = "laserx_lvl"
+		column = "rpg_lvl"
 		break
 	case 6:
+		column = "laserx_lvl"
+		break
+	case 7:
 		column = "awp_lvl"
 		break
 	}
@@ -93,15 +96,18 @@ func weaponUpgradeBulk(w http.ResponseWriter, r *http.Request){
 		column = "scatter_lvl"
 		break
 	case 3:
-		column = "firegun_lvl"
+		column = "laser_lvl"
 		break
 	case 4:
-		column = "rpg_lvl"
+		column = "firegun_lvl"
 		break
 	case 5:
-		column = "laserx_lvl"
+		column = "rpg_lvl"
 		break
 	case 6:
+		column = "laserx_lvl"
+		break
+	case 7:
 		column = "awp_lvl"
 		break
 	}

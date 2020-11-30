@@ -10,6 +10,7 @@ func  lookAdsWithShop(w http.ResponseWriter, r *http.Request)  {
 	var uuid = r.Header.Get("uuid")
 	var item = r.Header.Get("item")
 	itemId,err := strconv.Atoi(item)
+	fmt.Printf("[%s]",itemId)
 	if err != nil{
 		fmt.Printf("[%s]",err)
 	}
@@ -18,8 +19,8 @@ func  lookAdsWithShop(w http.ResponseWriter, r *http.Request)  {
 		fmt.Printf("[%s]",err1)
 	}
 	var shop_item_1,shop_item_2,diamond_count int
-	var item1,item2,item3,item4,item5 int64
-
+	var item2,item3,item4,item5 int64
+	var item1 float64
 	for rows1.Next(){
 		rows1.Columns()
 		err := rows1.Scan(&shop_item_1,&shop_item_2,&item1,&item2,&item3,&item4,&item5,&diamond_count)
