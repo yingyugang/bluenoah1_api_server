@@ -13,6 +13,9 @@ func inherenceUpgrade(w http.ResponseWriter, r *http.Request){
 	var coinStr = r.Header.Get("coin")
 	coinfloat,err := strconv.ParseFloat(coinStr,64)
 	diamondint,err := strconv.Atoi(diamondStr)
+	fmt.Printf("inherence: [%s]",inherence)
+	fmt.Printf("diamondStr: [%s]",diamondStr)
+
 	var column string
 	var max int = 35
 	//var plus int
@@ -64,7 +67,7 @@ func inherenceUpgrade(w http.ResponseWriter, r *http.Request){
 		break
 	}
 
-	rows,err := db1.Query("select " + column +",item1,diamond from user_info where device_id = ?",uuid)
+	rows,err := db1.Query("select " + column +",item1,diamond_count from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("select fail [%s]",err)
 	}
@@ -82,6 +85,6 @@ func inherenceUpgrade(w http.ResponseWriter, r *http.Request){
 	if inherenceV < max && item1 >= coinfloat && diamond >= diamondint {
 		inherenceV += 1
 	}
-	db1.Exec("update user_info  set " + column + " = ?,item1 = ?,diamond = ? where device_id = ?",inherenceV,item1-coinfloat,diamond-diamondint,uuid)
+	db1.Exec("update user_info  set " + column + " = ?,item1 = ?,diamond_count = ? where device_id = ?",inherenceV,item1-coinfloat,diamond-diamondint,uuid)
 	returnUser(w,uuid)
 }

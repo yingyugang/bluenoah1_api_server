@@ -362,7 +362,8 @@ func loginBonusObtain(w http.ResponseWriter, r *http.Request){
 }
 
 func main() {
-	db,err := sql.Open("mysql","root:810412@tcp(35.187.200.112:3306)/BlueNoah?charset=utf8")
+	//db,err := sql.Open("mysql","root:810412@tcp(35.187.200.112:3306)/BlueNoah?charset=utf8")
+	db,err := sql.Open("mysql","admin:810412612@tcp(bluenoah.cdcgxd165efz.ap-northeast-1.rds.amazonaws.com:3306)/BlueNoah?charset=utf8")
 	if err != nil{
 		fmt.Printf("connect mysql fail ! [%s]",err)
 	}else{
@@ -378,5 +379,6 @@ func main() {
 	http.HandleFunc("/revive",revive)
 	http.HandleFunc("/login_bonus_obtain",loginBonusObtain)
 	http.HandleFunc("/look_ads_with_shop",lookAdsWithShop)
+	http.HandleFunc("/purchase",purchase)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
