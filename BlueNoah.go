@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -361,6 +362,8 @@ func LoginBonusObtain(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+var blueNoahRand *rand.Rand
+
 func main() {
 	//db,err := sql.Open("mysql","root:810412@tcp(35.187.200.112:3306)/BlueNoah?charset=utf8")
 	db,err := sql.Open("mysql","admin:810412612@tcp(bluenoah.cdcgxd165efz.ap-northeast-1.rds.amazonaws.com:3306)/BlueNoah?charset=utf8")
@@ -370,6 +373,7 @@ func main() {
 		fmt.Println("connect to mysql success")
 	}
 	db1 = db
+	blueNoahRand = rand.New(rand.NewSource(99))
 	http.HandleFunc("/login", LoginViewHandler)
 	http.HandleFunc("/stage_clear", StageClear)
 	http.HandleFunc("/weapon_upgrade", WeaponUpgrade)
