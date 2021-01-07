@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func inherenceUpgrade(w http.ResponseWriter, r *http.Request){
+func InherenceUpgrade(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var inherence =  r.Header.Get("inherence")
 	var diamondStr =  r.Header.Get("diamond")

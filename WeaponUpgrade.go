@@ -12,7 +12,7 @@ var grade3 int = 120
 var grade4 int = 220
 var grade5 int = 400
 var grade6 int = 999
-func weaponUpgrade(w http.ResponseWriter, r *http.Request)  {
+func WeaponUpgrade(w http.ResponseWriter, r *http.Request)  {
 	var uuid = r.Header.Get("uuid")
 	var weapon = r.Header.Get("weapon")
 	weaponId,err :=  strconv.Atoi(weapon)
@@ -77,7 +77,7 @@ func weaponUpgrade(w http.ResponseWriter, r *http.Request)  {
 
 
 
-func weaponUpgradeBulk(w http.ResponseWriter, r *http.Request){
+func WeaponUpgradeBulk(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var weapon = r.Header.Get("weapon")
 	weaponId,err :=  strconv.Atoi(weapon)

@@ -109,7 +109,7 @@ func loadPage(title string) (*Page, error) {
 	return &Page{Title: title, Body: body}, nil
 }
 
-func loginViewHandler(w http.ResponseWriter, r *http.Request) {
+func LoginViewHandler(w http.ResponseWriter, r *http.Request) {
 	var uuid = checkSignin(r)
 	returnUser(w,uuid)
 }
@@ -233,7 +233,7 @@ func returnNull(w http.ResponseWriter){
 	fmt.Fprintf(w,"")
 }
 
-func stageClear(w http.ResponseWriter, r *http.Request){
+func StageClear(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	//TODO
 	var result = r.Header.Get("result")
@@ -264,7 +264,7 @@ func stageClear(w http.ResponseWriter, r *http.Request){
 	returnUser(w,uuid)
 }
 
-func setCurrentWeapon(w http.ResponseWriter, r *http.Request){
+func SetCurrentWeapon(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var weapon = r.Header.Get("weapon")
 	fmt.Printf("select fail [%s]",weapon)
@@ -276,7 +276,7 @@ func setCurrentWeapon(w http.ResponseWriter, r *http.Request){
 	returnUser(w,uuid)
 }
 
-func revive(w http.ResponseWriter, r *http.Request){
+func Revive(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var diamond_count int
 	rows,err := db1.Query("select diamond_count from user_info where device_id = ?",uuid)
@@ -299,7 +299,7 @@ func revive(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func loginBonusObtain(w http.ResponseWriter, r *http.Request){
+func LoginBonusObtain(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var ads = r.Header.Get("ads")
 	var lastday,loginday,bonus int
@@ -370,15 +370,15 @@ func main() {
 		fmt.Println("connect to mysql success")
 	}
 	db1 = db
-	http.HandleFunc("/login", loginViewHandler)
-	http.HandleFunc("/stage_clear",stageClear)
-	http.HandleFunc("/weapon_upgrade",weaponUpgrade)
-	http.HandleFunc("/weapon_upgrade_bulk",weaponUpgradeBulk)
-	http.HandleFunc("/weapon_set",setCurrentWeapon)
-	http.HandleFunc("/inherence_upgrade",inherenceUpgrade)
-	http.HandleFunc("/revive",revive)
-	http.HandleFunc("/login_bonus_obtain",loginBonusObtain)
-	http.HandleFunc("/look_ads_with_shop",lookAdsWithShop)
-	http.HandleFunc("/purchase",purchase)
+	http.HandleFunc("/login", LoginViewHandler)
+	http.HandleFunc("/stage_clear", StageClear)
+	http.HandleFunc("/weapon_upgrade", WeaponUpgrade)
+	http.HandleFunc("/weapon_upgrade_bulk", WeaponUpgradeBulk)
+	http.HandleFunc("/weapon_set", SetCurrentWeapon)
+	http.HandleFunc("/inherence_upgrade", InherenceUpgrade)
+	http.HandleFunc("/revive",Revive)
+	http.HandleFunc("/login_bonus_obtain", LoginBonusObtain)
+	http.HandleFunc("/look_ads_with_shop", LookAdsWithShop)
+	http.HandleFunc("/purchase",Purchase)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

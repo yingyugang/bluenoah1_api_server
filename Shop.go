@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func  lookAdsWithShop(w http.ResponseWriter, r *http.Request)  {
+func LookAdsWithShop(w http.ResponseWriter, r *http.Request)  {
 	var uuid = r.Header.Get("uuid")
 	var item = r.Header.Get("item")
 	itemId,err := strconv.Atoi(item)

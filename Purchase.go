@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func purchase(w http.ResponseWriter, r *http.Request){
+func Purchase(w http.ResponseWriter, r *http.Request){
 	var uuid = r.Header.Get("uuid")
 	var diamondStr =  r.Header.Get("diamond")
 	diamondint,err := strconv.Atoi(diamondStr)
