@@ -39,7 +39,7 @@ func LookAdsWithShop(w http.ResponseWriter, r *http.Request)  {
 		}
 		break
 	}
-
+	rows1.Close()
 	returnUser(w,uuid)
 
 

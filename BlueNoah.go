@@ -134,6 +134,7 @@ func returnUser(w http.ResponseWriter,uuid string){
 		}
 		break
 	}
+	rows.Close()
 	rows1, err := db1.Query("select id,atk,def,maxhp,hp,maxsp,sp,level,critical from hero_info where user_id = ?",id)
 	if err != nil{
 		fmt.Printf("returnUser:select fail [%s]",err)
@@ -146,10 +147,13 @@ func returnUser(w http.ResponseWriter,uuid string){
 		}
 		break
 	}
+	rows1.Close()
 	user := User{Uuid:uuid,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Item2:item2,Item3:item3,Item4:item4,Item5:item5,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl,Atk_up:atk_up,Atk_speed_up:atk_speed_up,Critical_up:critical_up,Speed_up:speed_up,Atk_boss_up:atk_boss_up,Hp_up:hp_up,Diamond_count:diamond_count,Dodge_up:dodge_up,Lastday:lastday,Loginday:loginday,Bonus:bonus,Shop_item_1:shop_item_1,Shop_item_2:shop_item_2 ,Item6: item6,Laser_lvl: laser_lvl,Coin_up: coin_up,Buff_up: buff_up}
 	result,err := json.Marshal(user)
-	fmt.Printf(string(result) )
+	fmt.Println(string(result) )
+	fmt.Println(db1.Stats().OpenConnections)
 	w.Write(result)
+
 }
 
 func checkSignin(r *http.Request)(uuidResult string)  {
@@ -176,6 +180,7 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 			uuid = device_id
 			break
 		}
+		rows.Close()
 	}else{
 		rows,err := db1.Query("select id,user_name,has_ios_account,ios_account from user_info where device_id = ?",uuid)
 		if err != nil{
@@ -192,6 +197,7 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 			mapUser[username] = id
 			break
 		}
+		rows.Close()
 	}
 
 	if len(mapUser) == 0 {
@@ -227,6 +233,7 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 		}
 		break
 	}
+	rows1.Close()
 	return uuid
 }
 
@@ -257,6 +264,7 @@ func StageClear(w http.ResponseWriter, r *http.Request){
 		}
 		break
 	}
+	rows.Close()
 	if battleResult.Stage == stage && battleResult.Clear == 1{
 		db1.Exec("update user_info  set stage = ?,item1 = ?,item2 = ?,item3 = ?,item4 = ?,item5 = ? where device_id = ?",stage + 1,battleResult.Item1 + item1,battleResult.Item2 + item2,battleResult.Item3 + item3,battleResult.Item4 + item4,battleResult.Item5 + item5,uuid)
 	}else{
@@ -292,6 +300,7 @@ func Revive(w http.ResponseWriter, r *http.Request){
 		}
 		break
 	}
+	rows.Close()
 	if diamond_count >= 10{
 		db1.Exec("update user_info  set diamond_count = ? where device_id = ?",diamond_count - 10,uuid)
 
@@ -319,6 +328,7 @@ func LoginBonusObtain(w http.ResponseWriter, r *http.Request){
 		}
 		break
 	}
+	rows.Close()
 	if bonus == 0{
 		var day = (loginday -1) % 7
 		var week = (loginday -1) / 7
@@ -368,14 +378,16 @@ var blueNoahRand *rand.Rand
 func main() {
 	//db,err := sql.Open("mysql","root:810412@tcp(35.187.200.112:3306)/BlueNoah?charset=utf8")
 	db,err := sql.Open("mysql","admin:810412612@tcp(bluenoah.cdcgxd165efz.ap-northeast-1.rds.amazonaws.com:3306)/BlueNoah?charset=utf8")
+	//db,err := sql.Open("mysql","admin:Yingyugang2017@tcp(bluenoah-dev.cdcgxd165efz.ap-northeast-1.rds.amazonaws.com:3306)/BlueNoah?charset=utf8")
+
 	if err != nil{
 		fmt.Printf("connect mysql fail ! [%s]",err)
 	}else{
 		fmt.Println("connect to mysql success")
 	}
 	db1 = db
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(65)
+	db.SetMaxIdleConns(65)
 	blueNoahRand = rand.New(rand.NewSource(99))
 	http.HandleFunc("/login", LoginViewHandler)
 	http.HandleFunc("/stage_clear", StageClear)

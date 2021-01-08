@@ -82,6 +82,7 @@ func InherenceUpgrade(w http.ResponseWriter, r *http.Request){
 		}
 		break
 	}
+	rows.Close()
 	if inherenceV < max && item1 >= coinfloat && diamond >= diamondint {
 		inherenceV += 1
 	}

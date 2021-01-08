@@ -62,6 +62,7 @@ func WeaponUpgrade(w http.ResponseWriter, r *http.Request)  {
 		}
 		break
 	}
+	rows.Close()
 	var upgradeData = getUpgradeData(lvl)
 	if upgradeData.Coin <= item1 && upgradeData.GreenGear <= item2 && upgradeData.BlueGear <= item3 && upgradeData.PurpleGear <= item4 && upgradeData.OrangeGear <= item5 && upgradeData.SupperGear <=item6{
 		item1 -= upgradeData.Coin
@@ -126,6 +127,7 @@ func WeaponUpgradeBulk(w http.ResponseWriter, r *http.Request){
 		}
 		break
 	}
+	rows.Close()
 	if lvl == grade1 || lvl == grade2 || lvl == grade3 || lvl == grade4 || lvl == grade5 {
 		returnUser(w,uuid)
 		return

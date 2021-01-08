@@ -23,6 +23,7 @@ func Purchase(w http.ResponseWriter, r *http.Request){
 		}
 		break
 	}
+	rows.Close()
 	db1.Exec("update user_info  set diamond_count = ? where device_id = ?",diamond_count + diamondint ,uuid)
 	returnUser(w,uuid)
 }
