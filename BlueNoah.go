@@ -294,6 +294,7 @@ func Revive(w http.ResponseWriter, r *http.Request){
 	}
 	if diamond_count >= 10{
 		db1.Exec("update user_info  set diamond_count = ? where device_id = ?",diamond_count - 10,uuid)
+
 		returnUser(w,uuid)
 	}else{
 		returnNull(w)
@@ -373,6 +374,8 @@ func main() {
 		fmt.Println("connect to mysql success")
 	}
 	db1 = db
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
 	blueNoahRand = rand.New(rand.NewSource(99))
 	http.HandleFunc("/login", LoginViewHandler)
 	http.HandleFunc("/stage_clear", StageClear)
