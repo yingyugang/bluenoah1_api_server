@@ -160,37 +160,61 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 	var uuid = r.Header.Get("uuid")
 	var ios = r.Header.Get("iosUser")
 	var hasIos = r.Header.Get("hasIosUser")
+	var android = r.Header.Get("androidUser")
+	var hasAndroid = r.Header.Get("hasAndroidUser")
+
 	hasIosInt,err := strconv.Atoi(hasIos)
+	hasAndroidInt,err := strconv.Atoi(hasAndroid)
 	var mapUser map[string]int
 	mapUser = make(map[string]int)
-	if len(uuid)==0 && hasIosInt==1 {
-		rows,err := db1.Query("select id,user_name,has_ios_account,ios_account,device_id from user_info where ios_account = ?",ios)
-		if err != nil{
-			fmt.Printf("select fail [%s]",err)
-		}
-		var id,has_ios_account int
-		var username,ios_account,device_id string
-		for rows.Next(){
-			rows.Columns()
-			err := rows.Scan(&id,&username,&has_ios_account,&ios_account,&device_id)
+	if len(uuid)==0 {
+		if hasIosInt==1{
+			rows,err := db1.Query("select id,user_name,has_ios_account,ios_account,device_id from user_info where ios_account = ?",ios)
 			if err != nil{
-				fmt.Printf("get user info error [%s]",err)
+				fmt.Printf("select fail [%s]",err)
 			}
-			mapUser[username] = id
-			uuid = device_id
-			break
+			var id,has_ios_account int
+			var username,ios_account,device_id string
+			for rows.Next(){
+				rows.Columns()
+				err := rows.Scan(&id,&username,&has_ios_account,&ios_account,&device_id)
+				if err != nil{
+					fmt.Printf("get user info error [%s]",err)
+				}
+				mapUser[username] = id
+				uuid = device_id
+				break
+			}
+			rows.Close()
+		}else if hasAndroidInt==1{
+			rows,err := db1.Query("select id,user_name,has_android_account,android_account,device_id from user_info where android_account = ?",android)
+			if err != nil{
+				fmt.Printf("select fail [%s]",err)
+			}
+			var id,has_android_account int
+			var username,android_account,device_id string
+			for rows.Next(){
+				rows.Columns()
+				err := rows.Scan(&id,&username,&has_android_account,&android_account,&device_id)
+				if err != nil{
+					fmt.Printf("get user info error [%s]",err)
+				}
+				mapUser[username] = id
+				uuid = device_id
+				break
+			}
+			rows.Close()
 		}
-		rows.Close()
 	}else{
 		rows,err := db1.Query("select id,user_name,has_ios_account,ios_account from user_info where device_id = ?",uuid)
 		if err != nil{
 			fmt.Printf("select fail [%s]",err)
 		}
-		var id,has_ios_account int
-		var username,ios_account string
+		var id int
+		var username string
 		for rows.Next(){
 			rows.Columns()
-			err := rows.Scan(&id,&username,&has_ios_account,&ios_account)
+			err := rows.Scan(&id,&username)
 			if err != nil{
 				fmt.Printf("get user info error [%s]",err)
 			}
@@ -202,7 +226,7 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 
 	if len(mapUser) == 0 {
 		var newuuid = createUUID()
-		r1, err1 := db1.Exec("insert into user_info (user_name,device_id,has_ios_account,ios_account) values (?,?,?,?)","New user",newuuid,hasIosInt,ios)
+		r1, err1 := db1.Exec("insert into user_info (user_name,device_id,has_ios_account,ios_account,has_android_account,android_account) values (?,?,?,?,?,?)","New user",newuuid,hasIosInt,ios,hasAndroidInt,android)
 		id, err1 := r1.LastInsertId()
 		if err1 != nil {
 			fmt.Println("exec failed, ", err1)
