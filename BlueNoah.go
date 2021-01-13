@@ -33,6 +33,7 @@ type UpgradeData struct {
 //注意，首字母一定要大写
 type User struct {
 	Uuid string
+	UserName string
 	HeroId int
 	Atk int
 	Def int
@@ -119,16 +120,16 @@ func returnUser(w http.ResponseWriter,uuid string){
 	var id,stage,heroId,atk,def,maxHp,hp,maxSp,sp,level,critical,current_w,ak47_lvl,m16_lvl,scatter_lvl,laser_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl int
 	var atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up,coin_up,buff_up int
 	var lastday,loginday,bonus,shop_item_1,shop_item_2 int
-
+    var userName string
 	var item2,item3,item4,item5,item6 int64
 	var item1 float64
-	rows,err := db1.Query("select id,stage,item1,item2,item3,item4,item5,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl,atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up,lastday,loginday,bonus,shop_item_1,shop_item_2,item6,laser_lvl,coin_up,buff_up  from user_info where device_id = ?",uuid)
+	rows,err := db1.Query("select id,user_name,stage,item1,item2,item3,item4,item5,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl,atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up,lastday,loginday,bonus,shop_item_1,shop_item_2,item6,laser_lvl,coin_up,buff_up  from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("returnUser:select fail [%s]",err)
 	}
 	for rows.Next(){
 		rows.Columns()
-		err := rows.Scan(&id,&stage,&item1,&item2,&item3,&item4,&item5,&current_w,&ak47_lvl,&m16_lvl,&scatter_lvl,&firegun_lvl,&rpg_lvl,&laserx_lvl,&awp_lvl,&atk_up,&atk_speed_up,&critical_up,&speed_up,&atk_boss_up,&hp_up,&diamond_count,&dodge_up,&lastday,&loginday,&bonus,&shop_item_1,&shop_item_2,&item6,&laser_lvl,&coin_up,&buff_up)
+		err := rows.Scan(&id,&userName,&stage,&item1,&item2,&item3,&item4,&item5,&current_w,&ak47_lvl,&m16_lvl,&scatter_lvl,&firegun_lvl,&rpg_lvl,&laserx_lvl,&awp_lvl,&atk_up,&atk_speed_up,&critical_up,&speed_up,&atk_boss_up,&hp_up,&diamond_count,&dodge_up,&lastday,&loginday,&bonus,&shop_item_1,&shop_item_2,&item6,&laser_lvl,&coin_up,&buff_up)
 		if err != nil{
 			fmt.Printf("returnUser:get user info error [%s]",err)
 		}
@@ -148,7 +149,7 @@ func returnUser(w http.ResponseWriter,uuid string){
 		break
 	}
 	rows1.Close()
-	user := User{Uuid:uuid,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Item2:item2,Item3:item3,Item4:item4,Item5:item5,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl,Atk_up:atk_up,Atk_speed_up:atk_speed_up,Critical_up:critical_up,Speed_up:speed_up,Atk_boss_up:atk_boss_up,Hp_up:hp_up,Diamond_count:diamond_count,Dodge_up:dodge_up,Lastday:lastday,Loginday:loginday,Bonus:bonus,Shop_item_1:shop_item_1,Shop_item_2:shop_item_2 ,Item6: item6,Laser_lvl: laser_lvl,Coin_up: coin_up,Buff_up: buff_up}
+	user := User{Uuid:uuid,UserName:userName,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Item2:item2,Item3:item3,Item4:item4,Item5:item5,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl,Atk_up:atk_up,Atk_speed_up:atk_speed_up,Critical_up:critical_up,Speed_up:speed_up,Atk_boss_up:atk_boss_up,Hp_up:hp_up,Diamond_count:diamond_count,Dodge_up:dodge_up,Lastday:lastday,Loginday:loginday,Bonus:bonus,Shop_item_1:shop_item_1,Shop_item_2:shop_item_2 ,Item6: item6,Laser_lvl: laser_lvl,Coin_up: coin_up,Buff_up: buff_up}
 	result,err := json.Marshal(user)
 	fmt.Println(string(result) )
 	fmt.Println(db1.Stats().OpenConnections)
@@ -206,7 +207,7 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 			rows.Close()
 		}
 	}else{
-		rows,err := db1.Query("select id,user_name,has_ios_account,ios_account from user_info where device_id = ?",uuid)
+		rows,err := db1.Query("select id,user_name from user_info where device_id = ?",uuid)
 		if err != nil{
 			fmt.Printf("select fail [%s]",err)
 		}
@@ -284,7 +285,7 @@ func StageClear(w http.ResponseWriter, r *http.Request){
 		rows.Columns()
 		err := rows.Scan(&stage,&item1,&item2,&item3,&item4,&item5)
 		if err != nil{
-			fmt.Printf("get user info error [%s]",err)
+			fmt.Printf("StageClear [%s]",err)
 		}
 		break
 	}
@@ -320,7 +321,7 @@ func Revive(w http.ResponseWriter, r *http.Request){
 		rows.Columns()
 		err := rows.Scan(&diamond_count)
 		if err != nil{
-			fmt.Printf("get user info error [%s]",err)
+			fmt.Printf("Revive [%s]",err)
 		}
 		break
 	}
@@ -348,7 +349,7 @@ func LoginBonusObtain(w http.ResponseWriter, r *http.Request){
 		rows.Columns()
 		err := rows.Scan(&item1,&item2,&item3,&item4,&item5,&diamond_count,&lastday,&loginday,&bonus)
 		if err != nil{
-			fmt.Printf("returnUser:get user info error [%s]",err)
+			fmt.Printf("LoginBonusObtain:get user info error [%s]",err)
 		}
 		break
 	}
@@ -423,5 +424,6 @@ func main() {
 	http.HandleFunc("/login_bonus_obtain", LoginBonusObtain)
 	http.HandleFunc("/look_ads_with_shop", LookAdsWithShop)
 	http.HandleFunc("/purchase",Purchase)
+	http.HandleFunc("/change_name",ChangeUserName)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
