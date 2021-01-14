@@ -168,7 +168,14 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 	hasAndroidInt,err := strconv.Atoi(hasAndroid)
 	var mapUser map[string]int
 	mapUser = make(map[string]int)
-	if len(uuid)==0 {
+	if ios == "1000"{
+		hasIosInt = 0
+	}
+	if android == "1000"{
+		hasAndroidInt = 0
+	}
+
+	if len(uuid)==0{
 		if hasIosInt==1{
 			rows,err := db1.Query("select id,user_name,has_ios_account,ios_account,device_id from user_info where ios_account = ?",ios)
 			if err != nil{
@@ -187,7 +194,7 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 				break
 			}
 			rows.Close()
-		}else if hasAndroidInt==1{
+		}else if hasAndroidInt==1 {
 			rows,err := db1.Query("select id,user_name,has_android_account,android_account,device_id from user_info where android_account = ?",android)
 			if err != nil{
 				fmt.Printf("select fail [%s]",err)
