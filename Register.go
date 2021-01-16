@@ -19,7 +19,10 @@ func checkSignin(r *http.Request)(uuidResult string)  {
 	var hasIos = r.Header.Get("hasIosUser")
 	var android = r.Header.Get("androidUser")
 	var hasAndroid = r.Header.Get("hasAndroidUser")
-	var user = r.URL.Query()["userName"][0]
+	var user = ""
+	if len(r.URL.Query()["userName"]) > 0{
+		user = r.URL.Query()["userName"][0]
+	}
 	if len(user) == 0{
 		user = "New User"
 	}
