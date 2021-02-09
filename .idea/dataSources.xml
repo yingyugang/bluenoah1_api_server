@@ -7,11 +7,17 @@
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://localhost:3306</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="@35.187.200.112" uuid="72290cfd-4dab-4752-8671-a4169a0e8f7c">
+    <data-source source="LOCAL" name="BB" uuid="fe58c647-14a0-4cd2-ab71-9472d9776ba0">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://35.187.200.112:3306</jdbc-url>
+      <jdbc-url>jdbc:mysql://bluenoah.cdcgxd165efz.ap-northeast-1.rds.amazonaws.com:3306/</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Dev" uuid="2adc9c69-d73a-4c53-bb89-e42f608bb9f1">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://bluenoah-dev.cdcgxd165efz.ap-northeast-1.rds.amazonaws.com:3306</jdbc-url>
     </data-source>
   </component>
 </project>

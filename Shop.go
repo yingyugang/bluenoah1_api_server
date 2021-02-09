@@ -31,7 +31,7 @@ func LookAdsWithShop(w http.ResponseWriter, r *http.Request)  {
 		}else if itemId == 2{
 			if shop_item_2 > 0 {
 				//var itemPlus2 = blueNoahRand.Int31n(3)
-				db1.Exec("update user_info set shop_item_2 = ?,item6 = ? where device_id = ?",shop_item_1 -1,diamond_count + 8,uuid)
+				db1.Exec("update user_info set shop_item_2 = ?,item6 = ? where device_id = ?",shop_item_2 -1,diamond_count + 8,uuid)
 			}
 		}
 		if err != nil{
