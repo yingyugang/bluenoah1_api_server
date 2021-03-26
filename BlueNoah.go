@@ -48,6 +48,7 @@ type User struct {
 	Item4 int64
 	Item5 int64
 	Item6 int64
+	Rescue int64
 	Critical int
 	Current_w int
 	Ak47_lvl int
@@ -82,10 +83,14 @@ type BattleResult struct {
 	Item3 int64
 	Item4 int64
 	Item5 int64
+	Item6 int64
+	Rescue int64
 	Clear int
 }
 
 var db1 *sql.DB
+
+var tokenMap map[string]string
 
 func createUUID() (uid string) {
 	u, err := uuid.NewRandom()
@@ -115,15 +120,15 @@ func returnUser(w http.ResponseWriter,uuid string){
 	var atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up,coin_up,buff_up int
 	var lastday,loginday,bonus,shop_item_1,shop_item_2 int
     var userName string
-	var item2,item3,item4,item5,item6 int64
+	var item2,item3,item4,item5,item6,rescue int64
 	var item1 float64
-	rows,err := db1.Query("select id,user_name,stage,item1,item2,item3,item4,item5,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl,atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up,lastday,loginday,bonus,shop_item_1,shop_item_2,item6,laser_lvl,coin_up,buff_up  from user_info where device_id = ?",uuid)
+	rows,err := db1.Query("select id,user_name,stage,item1,item2,item3,item4,item5,current_w,ak47_lvl,m16_lvl,scatter_lvl,firegun_lvl,rpg_lvl,laserx_lvl,awp_lvl,atk_up,atk_speed_up,critical_up,speed_up,atk_boss_up,hp_up,diamond_count,dodge_up,lastday,loginday,bonus,shop_item_1,shop_item_2,item6,laser_lvl,coin_up,buff_up,rescue  from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("returnUser:select fail [%s]",err)
 	}
 	for rows.Next(){
 		rows.Columns()
-		err := rows.Scan(&id,&userName,&stage,&item1,&item2,&item3,&item4,&item5,&current_w,&ak47_lvl,&m16_lvl,&scatter_lvl,&firegun_lvl,&rpg_lvl,&laserx_lvl,&awp_lvl,&atk_up,&atk_speed_up,&critical_up,&speed_up,&atk_boss_up,&hp_up,&diamond_count,&dodge_up,&lastday,&loginday,&bonus,&shop_item_1,&shop_item_2,&item6,&laser_lvl,&coin_up,&buff_up)
+		err := rows.Scan(&id,&userName,&stage,&item1,&item2,&item3,&item4,&item5,&current_w,&ak47_lvl,&m16_lvl,&scatter_lvl,&firegun_lvl,&rpg_lvl,&laserx_lvl,&awp_lvl,&atk_up,&atk_speed_up,&critical_up,&speed_up,&atk_boss_up,&hp_up,&diamond_count,&dodge_up,&lastday,&loginday,&bonus,&shop_item_1,&shop_item_2,&item6,&laser_lvl,&coin_up,&buff_up,&rescue)
 		if err != nil{
 			fmt.Printf("returnUser:get user info error [%s]",err)
 		}
@@ -143,7 +148,7 @@ func returnUser(w http.ResponseWriter,uuid string){
 		break
 	}
 	rows1.Close()
-	user := User{Uuid:uuid,UserName:userName,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Item2:item2,Item3:item3,Item4:item4,Item5:item5,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl,Atk_up:atk_up,Atk_speed_up:atk_speed_up,Critical_up:critical_up,Speed_up:speed_up,Atk_boss_up:atk_boss_up,Hp_up:hp_up,Diamond_count:diamond_count,Dodge_up:dodge_up,Lastday:lastday,Loginday:loginday,Bonus:bonus,Shop_item_1:shop_item_1,Shop_item_2:shop_item_2 ,Item6: item6,Laser_lvl: laser_lvl,Coin_up: coin_up,Buff_up: buff_up}
+	user := User{Uuid:uuid,UserName:userName,HeroId:heroId,Atk:atk,Def:def,MaxHp:maxHp,Hp:hp,MaxSp:maxSp,Sp:sp,Level:level,Stage:stage,Item1:item1,Item2:item2,Item3:item3,Item4:item4,Item5:item5,Critical: critical,Current_w:current_w,Ak47_lvl:ak47_lvl,M16_lvl:m16_lvl,Scatter_lvl:scatter_lvl,Firegun_lvl:firegun_lvl,Rpg_lvl:rpg_lvl,Laserx_lvl:laserx_lvl,Awp_lvl:awp_lvl,Atk_up:atk_up,Atk_speed_up:atk_speed_up,Critical_up:critical_up,Speed_up:speed_up,Atk_boss_up:atk_boss_up,Hp_up:hp_up,Diamond_count:diamond_count,Dodge_up:dodge_up,Lastday:lastday,Loginday:loginday,Bonus:bonus,Shop_item_1:shop_item_1,Shop_item_2:shop_item_2 ,Item6: item6,Laser_lvl: laser_lvl,Coin_up: coin_up,Buff_up: buff_up,Rescue: rescue}
 	result,err := json.Marshal(user)
 	fmt.Println(string(result) )
 	fmt.Println(db1.Stats().OpenConnections)
@@ -164,16 +169,16 @@ func StageClear(w http.ResponseWriter, r *http.Request){
 	var battleResult BattleResult
 	json.Unmarshal([]byte(result),&battleResult)
 
-	rows,err := db1.Query("select stage,item1,item2,item3,item4,item5 from user_info where device_id = ?",uuid)
+	rows,err := db1.Query("select stage,item1,item2,item3,item4,item5,item6,rescue from user_info where device_id = ?",uuid)
 	if err != nil{
 		fmt.Printf("select fail [%s]",err)
 	}
 	var stage int
-	var item2,item3,item4,item5 int64
+	var item2,item3,item4,item5,item6,rescue int64
 	var item1 float64
 	for rows.Next(){
 		rows.Columns()
-		err := rows.Scan(&stage,&item1,&item2,&item3,&item4,&item5)
+		err := rows.Scan(&stage,&item1,&item2,&item3,&item4,&item5,&item6,&rescue)
 		if err != nil{
 			fmt.Printf("StageClear [%s]",err)
 		}
@@ -181,9 +186,9 @@ func StageClear(w http.ResponseWriter, r *http.Request){
 	}
 	rows.Close()
 	if battleResult.Stage == stage && battleResult.Clear == 1{
-		db1.Exec("update user_info  set stage = ?,item1 = ?,item2 = ?,item3 = ?,item4 = ?,item5 = ? where device_id = ?",stage + 1,battleResult.Item1 + item1,battleResult.Item2 + item2,battleResult.Item3 + item3,battleResult.Item4 + item4,battleResult.Item5 + item5,uuid)
+		db1.Exec("update user_info  set stage = ?,item1 = ?,item2 = ?,item3 = ?,item4 = ?,item5 = ?,item6 = ?,rescue = ? where device_id = ?",stage + 1,battleResult.Item1 + item1,battleResult.Item2 + item2,battleResult.Item3 + item3,battleResult.Item4 + item4,battleResult.Item5 + item5,battleResult.Item6 + item6,battleResult.Rescue + rescue,uuid)
 	}else{
-		db1.Exec("update user_info  set item1 = ?,item2 = ?,item3 = ?,item4 = ?,item5 = ? where device_id = ?",battleResult.Item1 + item1,battleResult.Item2 + item2,battleResult.Item3 + item3,battleResult.Item4 + item4,battleResult.Item5 + item5,uuid)
+		db1.Exec("update user_info  set item1 = ?,item2 = ?,item3 = ?,item4 = ?,item5 = ?,item6 = ?,rescue = ? where device_id = ?",battleResult.Item1 + item1,battleResult.Item2 + item2,battleResult.Item3 + item3,battleResult.Item4 + item4,battleResult.Item5 + item5,battleResult.Item6 + item6,battleResult.Rescue + rescue,uuid)
 	}
 	returnUser(w,uuid)
 }
@@ -303,6 +308,7 @@ func main() {
 	db1 = db
 	db.SetMaxOpenConns(65)
 	db.SetMaxIdleConns(65)
+	tokenMap = make(map[string]string)
 	blueNoahRand = rand.New(rand.NewSource(99))
 	http.HandleFunc("/login", LoginViewHandler)
 	http.HandleFunc("/stage_clear", StageClear)
@@ -315,5 +321,8 @@ func main() {
 	http.HandleFunc("/look_ads_with_shop", LookAdsWithShop)
 	http.HandleFunc("/purchase",Purchase)
 	http.HandleFunc("/change_name",ChangeUserName)
+	http.HandleFunc("/registerToken",RegisterPushToken)
+	http.HandleFunc("/push",PushNotification)
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

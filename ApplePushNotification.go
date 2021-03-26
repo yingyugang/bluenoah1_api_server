@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func main() {
+func main1() {
 	cert, err := certificate.FromP12File("/Users/yingyugang/Documents/Keys/APNsDev.p12", "1fd94d19bbe3c")
 	if err != nil {
 		log.Fatal("Cert Error:", err)
